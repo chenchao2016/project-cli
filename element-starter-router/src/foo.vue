@@ -4,8 +4,12 @@
 <script>
 
     export default{
+        name:"FOO",
+        data(){
+            return {}
+        },
         beforeRouteEnter (to, from, next){
-            console.log(arguments);
+//            console.log(arguments);
             next()
         }
     }

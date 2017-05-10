@@ -3,5 +3,14 @@
 </template>
 <script>
 
-    export default{}
+    export default{
+        name:"BAR",
+        data(){
+            return {}
+        },
+        beforeRouteEnter(to,from,next){
+            console.log(to);
+            next();
+        }
+    }
 </script>

@@ -14,7 +14,7 @@ export default {
   methods: {},
   watch:{
     "$route":function (to,from,next) {
-      console.log(to);
+      console.log(11111);
     }
   }
 }
