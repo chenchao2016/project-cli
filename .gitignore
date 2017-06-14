@@ -6,3 +6,6 @@ npm-debug.log
 */node_modules/
 */.idea
 */dist/
+*/*/node_modules/
+*/*/.idea
+*/*/.gitignore
