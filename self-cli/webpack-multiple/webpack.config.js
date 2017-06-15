@@ -8,6 +8,7 @@ var getEntries = require('./webpack.entries');
 
 module.exports = function (options = {}) {
 
+    console.log(options);
     var {entry, plugins} = getEntries(options);
 
     var config = {
@@ -17,7 +18,7 @@ module.exports = function (options = {}) {
         output: {
             path         : path.resolve(__dirname, './dist'),
             publicPath   : '',
-            filename     : 'js/[name].js?[chunkhash:8]',
+            filename     : 'js/[name].js?[hash:8]',
             chunkFilename: '[id].js?[chunkhash]',
         },
         module: {
@@ -62,7 +63,7 @@ module.exports = function (options = {}) {
 
         plugins: [
             new webpack.optimize.CommonsChunkPlugin({
-                name: ['vendor', 'manifest']
+                name: ['vendor', 'mainfest']
             }),
 
             new ExtractTextWebpackPlugin({
