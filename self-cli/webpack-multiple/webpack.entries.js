@@ -33,13 +33,13 @@ module.exports = function (options = {}) {
         params['plugins'].push(
             new HtmlWebpackPlugin({
                     title   : name,
-                    template: 'src/index.pug',
+                    template: 'src/entries/'+name+'.pug',
                     filename: name + '.html',
                     chunks  : [name, 'vendor', 'mainfest'],
                     inject  : true,
                     hash    : false,
                     minify: { //压缩HTML文件
-                        removeComments: true,//移除HTML中的注释
+                        removeComments: false,//移除HTML中的注释
                         collapseWhitespace: false //删除空白符与换行符
                     }
                 })

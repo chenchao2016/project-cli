@@ -5,7 +5,7 @@
   "author": "chenchao <chenchao@servyou.com.cn>",
   "private": true,
   "scripts": {
-    "dev": "webpack-dev-server --open --hot --env.dev --env.mock",
+    "dev": "webpack-dev-server --open --inline --hot --env.dev --env.mock",
     "build": "rimraf dist && webpack -p --progress --hide-modules"
   },
   "dependencies": {
@@ -26,6 +26,8 @@
     "glob": "^7.1.2",
     "html-webpack-plugin": "^2.28.0",
     "jquery": "^3.2.1",
+    "less": "^2.7.2",
+    "less-loader": "^4.0.4",
     "node-sass": "^4.5.0",
     "pug-loader": "^2.3.0",
     "sass-loader": "^5.0.1",

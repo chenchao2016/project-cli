@@ -1,8 +1,9 @@
-var path = require('path')
+var path    = require('path')
 var webpack = require('webpack')
-var glob = require('glob')
+var glob    = require('glob')
 
 var ExtractTextWebpackPlugin = require('extract-text-webpack-plugin')
+var CopyWebpackPlugin = require('copy-webpack-plugin')
 
 var getEntries = require('./webpack.entries');
 
@@ -17,44 +18,60 @@ module.exports = function (options = {}) {
         },
         output: {
             path         : path.resolve(__dirname, './dist'),
-            publicPath   : '',
             filename     : 'js/[name].js?[hash:8]',
+            publicPath   : "",
             chunkFilename: '[id].js?[chunkhash]',
         },
         module: {
             rules: [
                 {
                     test   : /\.js$/,
-                    use : ['babel-loader'],
+                    use    : ['babel-loader'],
                     exclude: /node_modules/
                 },
                 //模板引擎处理
                 {
                     test: /\.html$/,
-                    use: [{
-                        loader: 'html-loader',
+                    use : [{
+                        loader : 'html-loader',
                         options: {
-                            root: path.resolve(__dirname, 'src'),
+                            root : path.resolve(__dirname, 'src'),
                             attrs: ['img:src', 'link:href']
                         }
                     }]
                 },
                 {
                     test: /\.pug$/,
-                    use: ['pug-loader']
+                    use : ['pug-loader']
                 },
                 //样式处理
                 {
-                    test  : /\.css$/,
-                    use: ExtractTextWebpackPlugin.extract({fallback: 'style-loader', use: 'css-loader'})
+                    test: /\.css$/,
+                    use : ExtractTextWebpackPlugin.extract({fallback: 'style-loader', use: 'css-loader'})
+                },
+                {
+                    test: /\.less$/,
+                    use: ExtractTextWebpackPlugin.extract({
+                        fallback: 'style-loader',
+                        use: [
+                        // 通过 loader 参数激活 source maps
+                        {
+                            loader: 'css-loader',
+                            options: { sourceMap: true, importLoaders: 1 }
+                        },
+                        {
+                            loader: 'less-loader',
+                            options: { sourceMap: true }
+                        }]
+                    })
                 },
                 //文件处理
                 {
-                    test   : /\.(png|jpg|gif|svg)$/,
-                    use: [{
-                        loader: 'file-loader',
-                        options: {
-                            name: '[name].[ext]?[hash]'
+                    test: /\.(png|jpg|gif|svg)$/,
+                    use : [{
+                        loader:'file-loader',
+                        options:{
+                          name : 'images/[name].[ext]?[hash]', limit:8192
                         }
                     }]
                 }
@@ -67,20 +84,25 @@ module.exports = function (options = {}) {
             }),
 
             new ExtractTextWebpackPlugin({
-                filename : 'css/[name].css?[hash:8]',
-                allChunks:true
-            })
+                filename : 'style/[name].css?[hash:8]',
+                allChunks: true
+            }),
+
+            new CopyWebpackPlugin([{
+                from: path.resolve(__dirname,"./src/images"),
+                to: path.resolve(__dirname,"./dist/images")
+            }])
         ],
 
         devServer  : {
             historyApiFallback: true,
-            noInfo            : true,
+            noInfo            : false,
             port              : 8088
         },
         performance: {
             hints: false
         },
-        devtool    : '#eval-source-map'
+        devtool    : '#source-map'
     };
 
     config.plugins = config.plugins.concat(plugins);
