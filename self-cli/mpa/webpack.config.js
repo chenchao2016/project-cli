@@ -1,120 +1,124 @@
-var path = require('path');
-var webpack = require('webpack');
-var glob = require('glob');
-var ExtractTextPlubin = require('extract-text-webpack-plugin');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
+var path    = require('path')
+var webpack = require('webpack')
+var glob    = require('glob')
 
-var CleanWebpackPlugin = require('clean-webpack-plugin');
-var CopyWebpackPlugin = require('copy-webpack-plugin');
+var ExtractTextWebpackPlugin = require('extract-text-webpack-plugin')
+var CopyWebpackPlugin        = require('copy-webpack-plugin')
 
+var getEntries = require('./webpack.entries');
 
-var entries = getEntry('./src/module/**/*.js'); // 获得入口js文件
+module.exports = function (options = {}) {
 
+    console.log(options);
+    var {entry, plugins} = getEntries(options);
 
-module.exports = {
-  entry: entries,
-  output: {
-    path: path.resolve(__dirname, './dist'),
-    publicPath: '/dist/',
-    filename: '/dist/js/[name].[hash:6].js'
-  },
-  module: {
-    rules: [
-      {
-        test: /\.vue$/,
-        loader: 'vue-loader',
-        options: {
-          loaders: {
-          }
-          // other vue-loader options go here
-        }
-      },
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: /node_modules/
-      },
-      {
-        test: /\.(png|jpg|gif|svg)$/,
-        loader: 'file-loader',
-        options: {
-          name: '[name].[ext]?[hash]'
-        }
-      }
-    ]
-  },
-  resolve: {
-    alias: {
-      'vue$': 'vue/dist/vue.esm.js'
-    },
-      extensions:['','.js','.less','.css']
-  },
-  devServer: {
-    historyApiFallback: true,
-    noInfo: true
-  },
-  performance: {
-    hints: false
-  },
-  devtool: '#eval-source-map'
-}
-
-if (process.env.NODE_ENV === 'production') {
-  module.exports.devtool = '#source-map'
-  // http://vue-loader.vuejs.org/en/workflow/production.html
-  module.exports.plugins = (module.exports.plugins || []).concat([
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: '"production"'
-      }
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-      sourceMap: true,
-      compress: {
-        warnings: false
-      }
-    }),
-    new webpack.LoaderOptionsPlugin({
-      minimize: true
-    })
-  ])
-}
-
-
-function getEntry(globPath) {
-    var entries = {},
-        basename, tmp, pathname;
-
-    glob.sync(globPath).forEach(function (entry) {
-        basename = path.basename(entry, path.extname(entry));
-        tmp = entry.split('/').splice(-3);
-        pathname = tmp.splice(0, 1) + '/' + basename; // 正确输出js和html的路径
-        entries[pathname] = entry;
-    });
-    return entries;
-}
-
-var pages = getEntry('./src/module/**/*.html');
-
-for (var pathname in pages) {
-    // 配置生成的html文件，定义路径等
-    var conf = {
-        filename: pathname + '.html',
-        template: pages[pathname],   // 模板路径
-        inject: true,              // js插入位置
-        minify: {
-            removeComments: true,
-            //collapseWhitespace: true,
-            //removeAttributeQuotes: true
+    var config = {
+        entry : {
+            vendor: './src/vendor'
         },
-        // necessary to consistently work with multiple chunks via CommonsChunkPlugin
-        chunksSortMode: 'dependency'
+        output: {
+            path         : path.resolve(__dirname, './dist'),
+            filename     : 'js/[name].js?[hash:8]',
+            publicPath   : "",
+            chunkFilename: '[id].js?[chunkhash]',
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.vue$/,
+                    use: ['vue-loader']
+                },
+                {
+                    test   : /\.js$/,
+                    use    : ['babel-loader'],
+                    exclude: /node_modules/
+                },
+                //模板引擎处理
+                {
+                    test: /\.html$/,
+                    use : [{
+                        loader : 'html-loader',
+                        options: {
+                            root : path.resolve(__dirname, 'src'),
+                            attrs: ['img:src', 'link:href']
+                        }
+                    }]
+                },
+                {
+                    test: /\.pug$/,
+                    use : ['pug-loader']
+                },
+                //样式处理
+                {
+                    test: /\.css$/,
+                    use : ExtractTextWebpackPlugin.extract({fallback: 'style-loader', use: 'css-loader'})
+                },
+                {
+                    test: /\.less$/,
+                    use : ExtractTextWebpackPlugin.extract({
+                        fallback: 'style-loader',
+                        use     : [
+                            // 通过 loader 参数激活 source maps
+                            {
+                                loader : 'css-loader',
+                                options: {sourceMap: true, importLoaders: 1}
+                            },
+                            {
+                                loader : 'less-loader',
+                                options: {sourceMap: true}
+                            }]
+                    })
+                },
+                //文件处理
+                {
+                    test: /\.(png|jpg|gif|svg)$/,
+                    use : [{
+                        loader : 'file-loader',
+                        options: {
+                            name: 'images/[name].[ext]?[hash]', limit: 8192
+                        }
+                    }]
+                }
+            ]
+        },
+
+        plugins: [
+            new webpack.optimize.CommonsChunkPlugin({
+                name: ['vendor', 'mainfest']
+            }),
+
+            new ExtractTextWebpackPlugin({
+                filename : 'style/[name].css?[hash:8]',
+                allChunks: true
+            }),
+
+            new CopyWebpackPlugin([{
+                from: path.resolve(__dirname, "./src/assets/images"),
+                to  : path.resolve(__dirname, "./dist/images")
+            }])
+        ],
+
+        resolve: {
+            alias: {
+                "~": path.resolve(__dirname, 'src'),
+                '@': path.resolve(__dirname, 'node_modules')
+            }
+        },
+
+        devServer  : {
+            historyApiFallback: true,
+            noInfo            : false,
+            port              : 8081
+        },
+        performance: {
+            hints: false
+        },
+        devtool    : '#source-map'
     };
 
-    if (pathname in module.exports.entry) {
-        conf.chunks = ['manifest', 'vendor', pathname];
-        conf.hash = true;
-    }
+    config.plugins = config.plugins.concat(plugins);
 
-    module.exports.plugins.push(new HtmlWebpackPlugin(conf));
-}
+    Object.assign(config.entry, entry);
+
+    return config;
+};
