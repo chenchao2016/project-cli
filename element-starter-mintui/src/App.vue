@@ -3,6 +3,7 @@
       <mt-picker :slots="myslots" value-key="name" @change="onValuesChange" :visible-item-count="5"></mt-picker>
       <br>
       <p>{{province}} | {{city}} | {{direct}}</p>
+
   </div>
 </template>
 
