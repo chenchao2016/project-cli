@@ -5,8 +5,6 @@ import App from './App.vue'
 
 Vue.use(ElementUI)
 
-console.log(App);
-
 new Vue({
   el: '#app',
   render: h => h(App)

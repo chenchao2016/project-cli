@@ -1,7 +1,26 @@
 <template>
   <div id="app">
 
+      <myModel></myModel>
     <h1>{{ msg }}</h1>
+
+      <el-select
+              popper-class="hello"
+              v-model.number="value9"
+              filterable
+              remote
+              no-data-text="请输入四位尾号或完整手机号"
+              placeholder="请输入关键词"
+              :remote-method="remoteMethod"
+              :loading="loading">
+          <el-option
+                  v-for="item in options4"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+          </el-option>
+      </el-select>
+
 
     <el-button @click.native="startHacking">Let's do it</el-button>
     <el-table :data="tabledata" border @cell-mouse-enter="mouseenter"   :show-summary="true" summary-text="合计" :summary-method="mysum">
@@ -36,7 +55,6 @@
           </el-form-item>
       </el-form>
 
-      <testOk v-model="msg" :msg="myname"></testOk>
 
       <el-tree :data="data2" show-checkbox="" default-expand-all="" node-key="id" ref="tree" highlight-current :props="defaultProps" @check-change="checkChange" @node-click="nodeClick">
       </el-tree>
@@ -52,10 +70,32 @@
 </template>
 
 <script>
-    import testOk from './model.vue'
+    import myModel from './model.vue'
+
 export default {
   data () {
     return {
+        options4: [],
+        value9: [],
+        list: [],
+        loading: false,
+        states: ["Alabama", "Alaska", "Arizona",
+            "Arkansas", "California", "Colorado",
+            "Connecticut", "Delaware", "Florida",
+            "Georgia", "Hawaii", "Idaho", "Illinois",
+            "Indiana", "Iowa", "Kansas", "Kentucky",
+            "Louisiana", "Maine", "Maryland",
+            "Massachusetts", "Michigan", "Minnesota",
+            "Mississippi", "Missouri", "Montana",
+            "Nebraska", "Nevada", "New Hampshire",
+            "New Jersey", "New Mexico", "New York",
+            "North Carolina", "North Dakota", "Ohio",
+            "Oklahoma", "Oregon", "Pennsylvania",
+            "Rhode Island", "South Carolina",
+            "South Dakota", "Tennessee", "Texas",
+            "Utah", "Vermont", "Virginia",
+            "Washington", "West Virginia", "Wisconsin",
+            "Wyoming"],
       msg: 'Use Vue 2.0 Today!',
       tabledata:[
         {
@@ -119,12 +159,30 @@ export default {
         }
     }
   },
-
+    mounted(){
+        this.list = this.states.map(item => {
+            return { value: item, label: item };
+        });
+    },
     components:{
-        testOk
+        myModel
     },
 
   methods: {
+      remoteMethod(query) {
+          let reg = /(^[0-9]{4}$)|(^1[0-9]{10}$)/;
+
+          if ( reg.test(query)) {
+              this.loading = true;
+
+              setTimeout(() => {
+                  this.loading = false;
+                  this.options4 = this.list;
+              }, 200);
+          } else {
+              this.options4 = [];
+          }
+      },
     startHacking () {
       this.$notify({
         title: 'It Works',

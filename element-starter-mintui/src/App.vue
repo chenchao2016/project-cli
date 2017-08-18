@@ -10,18 +10,18 @@
 <script>
 
 const province = [ {
+  name:'浙江 ',
+  id:"2",
+  pid:"0"
+},{
     name:'北京',
     id:"1",
-    pid:"0"
-},{
-    name:'浙江 ',
-    id:"2",
     pid:"0"
 }];
 
 const city = [{
     name:"北京",
-    id:"1",
+    id:"16",
     pid:"1"
 },{
     name:"杭州",
@@ -38,7 +38,7 @@ const city = [{
 const direct = [{
     name:"朝阳区",
     id:"4",
-    pid:"1"
+    pid:"16"
 },{
     name:"滨江区",
     id:"5",
@@ -79,7 +79,7 @@ export default {
           values:province,
           className: 'slot1',
           textAlign: 'right',
-          defaultIndex: 0
+          defaultIndex: 1
       }, {
           divider: true,
           content: '-',
@@ -114,6 +114,7 @@ export default {
           let cities = city.filter(function (item,index,arr) {
               return item.pid == provinceId;
           });
+
           picker.setSlotValues(1, cities);
 
           if(!values[1]) return;
@@ -122,11 +123,10 @@ export default {
           let directs = direct.filter(function (item,index,arr) {
               return item.pid == cityId;
           });
+
           picker.setSlotValues(2, directs);
 
-          this.province = values[0]['name'];
-          this.city = values[1]['name'];
-          this.direct = values[2]['name'];
+
       }
   }
 }
