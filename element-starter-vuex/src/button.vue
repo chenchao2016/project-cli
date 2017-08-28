@@ -1,16 +1,31 @@
 <template>
-    <div id="" class="">
+    <div id="" class=""  @click.ctrl="eventxsf">
         <button type="button" @click="submit">click</button>
         <button type="button" @click="test">test</button>
+        <button ><span>xsf</span></button>
+        <input type="text" v-model="msg">
+        <div>{{messageCompute}}</div>
     </div>
 </template>
 <script>
 
     export default{
         data(){
-          return {}
+          return {
+              msg:'messagetest'
+          }
+        },
+        computed:{
+            messageCompute(value){
+                console.log('change');
+                console.log(this.msg);
+//                return this.msg+new Date().getTime();
+            },
         },
         methods:{
+            eventxsf(){
+                console.log(123)
+            },
             submit(){
                 this.$store.commit('showName');
             },
