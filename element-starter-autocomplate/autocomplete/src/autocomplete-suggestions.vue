@@ -84,6 +84,7 @@
     created() {
       this.$on('visible', (val, inputWidth) => {
         this.dropdownWidth = inputWidth + 'px';
+        console.log(val)
         this.showPopper = val;
       });
     }

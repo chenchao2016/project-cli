@@ -92,6 +92,8 @@
         activated: false,
         isOnComposition: false,
         suggestions: [],
+
+        showSuggestion:false,
         loading: false,
         highlightedIndex: -1
       };
@@ -111,6 +113,7 @@
     methods: {
   
       getData(queryString) {
+        this.showSuggestion = true;
         console.log(queryString)
         this.loading = true;
         this.fetchSuggestions(queryString, (suggestions) => {
