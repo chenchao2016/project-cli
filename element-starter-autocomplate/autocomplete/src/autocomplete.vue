@@ -20,7 +20,7 @@
         <slot name="append"></slot>
       </template>
     </el-input>
-    <el-button  type="default" :class='triggerButtonClass' @click.native='handleclickOfmine' >{{triggerButton}}</el-button>
+    <el-button v-if='triggerOnButton'  type="default" :class='triggerButtonClass' @click.native='handleclickOfmine' >{{triggerButton}}</el-button>
     <el-autocomplete-suggestions
       :props="props"
       :class="[popperClass ? popperClass : '']"
@@ -107,16 +107,21 @@
     },
     watch: {
       suggestionVisible(val) {
+        
         this.broadcast('ElAutocompleteSuggestions', 'visible', [val, this.$refs.input.$refs.input.offsetWidth]);
       }
     },
     methods: {
   
       getData(queryString) {
+
+        if(this.triggerOnButton && !queryString) return;
+
         this.showSuggestion = true;
         console.log(queryString)
         this.loading = true;
         this.fetchSuggestions(queryString, (suggestions) => {
+          console.log(suggestions)
           this.loading = false;
           if (Array.isArray(suggestions)) {
             this.suggestions = suggestions;
@@ -156,6 +161,7 @@
       },
       close(e) {
         this.activated = false;
+        if(this.triggerOnButton) this.suggestions = [];
       },
       handleKeyEnter(e) {
         if (this.suggestionVisible && this.highlightedIndex >= 0 && this.highlightedIndex < this.suggestions.length) {

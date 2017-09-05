@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <h1>{{ msg }}</h1>
-    <el-autocomplete class="inline-input" v-model="state2" :fetch-suggestions="querySearch" placeholder="请输入内容" :trigger-on-focus="false" :trigger-on-button="true" trigger-button="查询" trigger-button-class="mybutton"  @select="handleSelect" ></el-autocomplete>
+    <el-autocomplete class="inline-input" v-model="state2" :fetch-suggestions="querySearch" placeholder="请输入内容" :trigger-on-focus="true" :trigger-on-button="true" trigger-button="查询" trigger-button-class="mybutton"  @select="handleSelect" ></el-autocomplete>
   </div>
 </template>
 
@@ -18,9 +18,15 @@ export default {
     methods: {
         querySearch(queryString, cb) {
             var restaurants = this.restaurants;
-            var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
-            // 调用 callback 返回建议列表的数据
-            cb(results);
+            setTimeout(() => {
+                var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
+                // 调用 callback 返回建议列表的数据
+                console.log(results);
+                if(results.length===0) results.push( { "value": "未查询到数据", "address": "" },);
+                console.log('------');
+                cb(results);
+            },2000)
+           
         },
         createFilter(queryString) {
             return (restaurant) => {
